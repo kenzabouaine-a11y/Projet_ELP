@@ -1,0 +1,171 @@
+/* ============================================
+   TcTurtle - Styles Modernes et Élégants
+   ============================================ */
+
+/* Variables CSS pour les couleurs */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --success-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    --primary-color: #667eea;
+    --primary-dark: #5568d3;
+    --text-dark: #2c3e50;
+    --text-light: #95a5a6;
+    --border-color: #e1e8ed;
+    --shadow-sm: 0 2px 5px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 15px rgba(0,0,0,0.2);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+/* Reset et styles de base */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--primary-gradient);
+    font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#elm-app {
+    min-height: 100vh;
+}
+
+/* Amélioration des textarea */
+textarea {
+    transition: all 0.3s ease !important;
+}
+
+textarea:focus {
+    outline: none !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    transform: translateY(-1px);
+}
+
+/* Amélioration des boutons */
+button {
+    transition: all 0.3s ease !important;
+    font-family: inherit !important;
+}
+
+button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+}
+
+button:active {
+    transform: translateY(0) !important;
+}
+
+/* Boutons d'exemple */
+button:not([style*="background: linear-gradient(135deg, #667eea"]) {
+    background: white !important;
+}
+
+button:not([style*="background: linear-gradient(135deg, #667eea"]):hover {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Zone SVG améliorée */
+svg {
+    display: block !important;
+    margin: 20px auto !important;
+    border: 2px solid var(--border-color) !important;
+    background: white !important;
+    border-radius: 8px !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: all 0.3s ease !important;
+}
+
+svg:hover {
+    box-shadow: var(--shadow-md) !important;
+    transform: scale(1.01);
+}
+
+/* Animation pour les sections */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animation pour les boutons d'exemple */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Styles supplémentaires pour une meilleure expérience */
+h1, h2, h3, p, label, span {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+    
+    h1 {
+        font-size: 2em !important;
+    }
+    
+    #elm-app > div {
+        padding: 20px !important;
+    }
+    
+    button {
+        padding: 10px 20px !important;
+        font-size: 14px !important;
+    }
+}
+
+/* Amélioration de la lisibilité */
+::selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: var(--text-dark);
+}
+
+/* Scrollbar personnalisée (pour les navigateurs qui le supportent) */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Effet de focus amélioré pour l'accessibilité */
+button:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
