@@ -9,7 +9,7 @@ elm make src/Main.elm --output=Main.js
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo ✅ Compilation réussie ! Main.js a été généré.
+    echo Compilation réussie ! Main.js a été généré.
     echo Vous pouvez maintenant ouvrir index.html dans votre navigateur.
     echo.
 ) else (

@@ -9,12 +9,11 @@ module Main exposing (main, Model, Msg(..), ParseResult(..), AnimationState(..),
 
 import Browser
 import Browser.Events
-import Html exposing (Html, div, h1, h2, label, button, text, textarea, p, span)
-import Html.Attributes exposing (type_, value, placeholder, rows, cols, style, class, id)
+import Html exposing (Html, div, h1, h2, label, button, text, textarea, p)
+import Html.Attributes exposing (value, placeholder, rows, style)
 import Html.Events exposing (onClick, onInput)
 import TurtleParser exposing (read, ParseError(..), TurtleProgram, Instruction(..))
 import Draw exposing (display, displayPartial)
-import Svg
 
 {-| Modèle d'état de l'application -}
 type alias Model =
@@ -160,16 +159,10 @@ update msg model =
                     ( model, Cmd.none )
 
         ResetAnimation ->
-            case model.result of
-                ParsedOk program ->
-                    ( { model | animationState = NotAnimating, animationCounter = 0 }
-                    , Cmd.none
-                    )
+            ( { model | animationState = NotAnimating, animationCounter = 0 }
+            , Cmd.none
+            )
 
-                _ ->
-                    ( { model | animationState = NotAnimating, animationCounter = 0 }
-                    , Cmd.none
-                    )
 
         HelpButtonClicked ->
             ( { model | showHelp = not model.showHelp }

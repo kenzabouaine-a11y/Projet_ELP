@@ -1,7 +1,3 @@
-/* ============================================
-   TcTurtle - Styles Modernes et Élégants
-   ============================================ */
-
 /* Variables CSS pour les couleurs */
 :root {
     --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -112,7 +108,7 @@ svg:hover {
     }
 }
 
-/* Styles supplémentaires pour une meilleure expérience */
+/* Styles supplémentaires */
 h1, h2, h3, p, label, span {
     animation: fadeIn 0.5s ease-out;
 }
