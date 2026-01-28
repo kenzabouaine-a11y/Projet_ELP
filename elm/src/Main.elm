@@ -12,7 +12,7 @@ import Browser.Events
 import Html exposing (Html, div, h1, h2, label, button, text, textarea, p)
 import Html.Attributes exposing (value, placeholder, rows, style)
 import Html.Events exposing (onClick, onInput)
-import TurtleParser exposing (read, ParseError(..), TurtleProgram, Instruction(..))
+import TurtleParser exposing (read, ParseError, TurtleProgram, Instruction(..))
 import Draw exposing (display, displayPartial)
 
 {-| Modèle d'état de l'application -}

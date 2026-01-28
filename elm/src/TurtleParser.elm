@@ -11,10 +11,10 @@ import Parser as ParserLib exposing (Parser, (|.), (|=), succeed, symbol, int, s
 
 {-| Type d'instruction du langage TcTurtle -}
 type Instruction
-    = Forward Int                    -- Avancer d'une distance
-    | Left Int                      -- Tourner à gauche d'un angle
-    | Right Int                     -- Tourner à droite d'un angle
-    | Repeat Int (List Instruction)  -- Répéter une liste d'instructions
+    = Forward Int                     
+    | Left Int                    
+    | Right Int                      
+    | Repeat Int (List Instruction)   
 
 {-| Programme = liste d'instructions -}
 type alias TurtleProgram =
@@ -22,10 +22,7 @@ type alias TurtleProgram =
 
 {-| Type d'erreur de parsing -}
 type ParseError
-    = SyntaxError String          -- Erreur de syntaxe
-    | UnexpectedEnd              -- Fin inattendue
-    | InvalidNumber String        -- Nombre invalide
-    | UnknownInstruction String   -- Instruction inconnue
+    = InvalidFormat
 
 
 {-| Parse une chaîne de code TcTurtle et retourne un programme ou une erreur -}
@@ -128,4 +125,4 @@ parseRepeat =
 {-| Convertit les erreurs du parser Elm en type ParseError personnalisé -}
 convertParserError : List DeadEnd -> ParseError
 convertParserError _ =
-    SyntaxError "Format incorrect"
+    InvalidFormat
