@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Dou Di Zhu - Projet ELP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-badge">ELP</span>
+        <span class="brand-title">Dou Di Zhu (斗地主)</span>
+      </div>
+      <div class="header-right">
+        <button id="help-btn" class="ghost-btn">Aide</button>
+        <button id="board-btn" class="ghost-btn">Classement</button>
+        <button id="new-game-btn" class="primary-btn">Nouvelle manche</button>
+      </div>
+    </header>
+
+    <main class="table">
+      <section class="player-row top-row">
+        <div class="player-panel ai" id="player-1">
+          <div class="player-meta">
+            <span class="player-name">Joueur du haut (IA)</span>
+            <span class="player-role-badge" id="p1-role"></span>
+          </div>
+          <div class="card-back-row" id="p1-hand">17 cartes</div>
+        </div>
+      </section>
+
+      <section class="center-row">
+        <div class="lord-cards">
+          <div class="lord-label">Cartes du donneur</div>
+          <div class="lord-slots" id="lord-cards"></div>
+        </div>
+        <div class="table-play">
+          <div class="status-line" id="status-line">Cliquez sur « Nouvelle manche » pour commencer.</div>
+          <div class="last-play">
+            <div class="last-meta" id="last-meta"></div>
+            <div class="last-cards" id="last-cards"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="player-row bottom-row">
+        <div class="player-panel ai" id="player-2">
+          <div class="player-meta">
+            <span class="player-name">Joueur du bas (IA)</span>
+            <span class="player-role-badge" id="p2-role"></span>
+          </div>
+          <div class="card-back-row" id="p2-hand">17 cartes</div>
+        </div>
+
+        <div class="player-panel human" id="player-0">
+          <div class="player-meta">
+            <span class="player-name">Vous</span>
+            <span class="player-role-badge" id="p0-role"></span>
+          </div>
+          <div class="hand-row" id="p0-hand"></div>
+          <div class="controls">
+            <button id="play-btn" class="primary-btn">Jouer</button>
+            <button id="pass-btn" class="ghost-btn">Passer</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>Projet JavaScript ELP · Dou Di Zhu</span>
+      <span class="hint">Version simplifiée : l’objectif est de mettre en valeur les mécanismes du langage.</span>
+    </footer>
+  </div>
+
+  <div id="help-modal" class="modal-backdrop">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <span>Rappel des combinaisons</span>
+        <button class="modal-close" data-close="help-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Ce projet implémente une version simplifiée de Dou Di Zhu, en conservant les principales combinaisons :</p>
+        <ul>
+          <li>Carte seule / paire / brelan</li>
+          <li>Brelan + une carte isolée (3 + 1)</li>
+          <li>Suite : au moins 5 cartes consécutives (sans 2 ni joker)</li>
+          <li>Suite de paires : par ex. 3-3, 4-4, 5-5 (sans 2 ni joker)</li>
+          <li>Avion : suite de brelans, par ex. 3-3-3, 4-4-4 (sans cartes annexes)</li>
+          <li>Bombe : quatre cartes identiques, ou les deux jokers (la plus forte combinaison)</li>
+        </ul>
+        <p>Deux coups ne peuvent être comparés que s’ils ont le même type et le même nombre de cartes. Une bombe peut battre n’importe quelle combinaison non bombe.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="board-modal" class="modal-backdrop">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <span>Classement local</span>
+        <button class="modal-close" data-close="board-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <table class="board-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Joueur</th>
+              <th>Victoires</th>
+            </tr>
+          </thead>
+          <tbody id="board-body"></tbody>
+        </table>
+        <p class="board-hint">Ce classement est stocké uniquement dans votre navigateur et utilise des données fictives.</p>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bgm" src="./ddz-bgm.mp3" loop></audio>
+
+  <script src="./deck.js"></script>
+  <script src="./rules.js"></script>
+  <script src="./ai.js"></script>
+  <script src="./game.js"></script>
+</body>
+</html>
+
