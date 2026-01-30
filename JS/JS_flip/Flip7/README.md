@@ -1,12 +1,10 @@
 #  Flip 7 - Jeu de Cartes Texte
 
-Un jeu de cartes multi-joueurs en mode texte pour Node.js, où l'objectif est d'être le premier à atteindre **200 points**.
-
 ## Description
 
 **Flip 7** est un jeu de cartes basé sur la gestion du risque et la stratégie. Les joueurs piochent des cartes et accumulent des points, mais doivent faire attention aux doublons qui peuvent les éliminer. L'originalité du jeu réside dans les **cartes d'action** qui offrent des bonus ou des pénalités spectaculaires.
 
-## Démarrage Rapide
+## Démarrage 
 
 ### Installation
 
@@ -60,13 +58,13 @@ Le jeu vous demande le nombre de joueurs, puis lance le jeu en mode interactif.
    - Voit son score intermédiaire et ses cartes
    - Décide de **piocher** ou de **s'arrêter**
    - Si pioche : reçoit une carte qui s'applique immédiatement
-3. **Fin de manche** : Quand tous les joueurs restants se sont arrêtés ou sont éliminés
+3. **Fin de manche** : Quand tous les joueurs restants se sont arrêtés ou sont éliminés, ou flip 7
 4. **Calcul des scores** : Chaque joueur marque les points de sa main
 
 ### Règles Clés
 
 #### Doublon = Éliminé
-Si vous pichez une carte avec une valeur que vous avez déjà :
+Si vous piochez une carte avec une valeur que vous avez déjà :
 - **Avec SecondChance** : La carte est défaussée, vous gardez votre main
 - **Sans SecondChance** : Vous êtes busted (éliminé) = **0 point**
 
@@ -129,7 +127,7 @@ Flip7/
 - Sauvegarde chaque manche dans `games.json`
 - Format : historique avec ID, date, joueurs, scores
 
-## � Interface Utilisateur
+## Interface Utilisateur
 
 ### Affichage en Couleurs
 
@@ -146,9 +144,9 @@ L'interface utilise des codes couleurs ANSI pour plus de clarté :
 
 Affichage du statut de tous les joueurs :
 ```
-╔════════ MANCHE 1 ════════╗
+╔═════════════ MANCHE 1 ══════════════╗
 ║  → Joueur 1  ❄ Joueur 2  ⏸ Joueur 3
-╚════════════════════════════════╝
+╚═════════════════════════════════════╝
 ```
 
 ### Tour de Jeu
@@ -178,25 +176,25 @@ Cible (1-2) : 1
 
 Tableau clair et coloré avec classement :
 ```
-╔════════════ RÉSULTATS MANCHE 1 ════════════╗
+╔════════════ RÉSULTATS MANCHE 1 ═══════════════╗
 ║
 ║ 1. Alice           32 pts (total:  32) 
 ║ 2. Bob             18 pts (total:  18) 
 ║ 3. Charlie         -5 pts (total:  -5) (busted)
-╚═══════════════════════════════════════════╝
+╚═══════════════════════════════════════════════╝
 ```
 
 ## Exemple de Partie
 
 ```
- NOUVELLE PARTIE (historique effacé)
+ NOUVELLE PARTIE 
 Nombre de joueurs : 2
 
 ════════════════════════════
  FLIP 7 - 2 joueurs
 ════════════════════════════
 
-╔════════ MANCHE 1 ════════╗
+╔════════ MANCHE 1 ══════════════╗
 ║  → Joueur 1  → Joueur 2
 ╚════════════════════════════════╝
 
