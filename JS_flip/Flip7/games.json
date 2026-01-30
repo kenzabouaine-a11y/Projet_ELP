@@ -1,0 +1,158 @@
+{
+  "games": [
+    {
+      "id": 1,
+      "date": "2026-01-29T12:56:08.298Z",
+      "numPlayers": 2,
+      "players": [
+        {
+          "name": "Joueur 1",
+          "numberCards": [],
+          "modifiers": [
+            {
+              "type": "modifier",
+              "kind": "plus6"
+            }
+          ],
+          "busted": true,
+          "frozen": false,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        },
+        {
+          "name": "Joueur 2",
+          "numberCards": [],
+          "modifiers": [],
+          "busted": false,
+          "frozen": true,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "date": "2026-01-29T12:56:18.257Z",
+      "numPlayers": 2,
+      "players": [
+        {
+          "name": "Joueur 1",
+          "numberCards": [],
+          "modifiers": [
+            {
+              "type": "modifier",
+              "kind": "plus4"
+            }
+          ],
+          "busted": false,
+          "frozen": true,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        },
+        {
+          "name": "Joueur 2",
+          "numberCards": [],
+          "modifiers": [],
+          "busted": true,
+          "frozen": false,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "date": "2026-01-29T12:56:26.476Z",
+      "numPlayers": 2,
+      "players": [
+        {
+          "name": "Joueur 1",
+          "numberCards": [],
+          "modifiers": [
+            {
+              "type": "modifier",
+              "kind": "plus2"
+            },
+            {
+              "type": "modifier",
+              "kind": "x2"
+            }
+          ],
+          "busted": true,
+          "frozen": false,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        },
+        {
+          "name": "Joueur 2",
+          "numberCards": [],
+          "modifiers": [],
+          "busted": true,
+          "frozen": false,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "date": "2026-01-29T12:56:32.230Z",
+      "numPlayers": 2,
+      "players": [
+        {
+          "name": "Joueur 1",
+          "numberCards": [],
+          "modifiers": [],
+          "busted": true,
+          "frozen": false,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        },
+        {
+          "name": "Joueur 2",
+          "numberCards": [],
+          "modifiers": [],
+          "busted": true,
+          "frozen": false,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "date": "2026-01-29T12:56:49.391Z",
+      "numPlayers": 2,
+      "players": [
+        {
+          "name": "Joueur 1",
+          "numberCards": [],
+          "modifiers": [],
+          "busted": false,
+          "frozen": true,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        },
+        {
+          "name": "Joueur 2",
+          "numberCards": [],
+          "modifiers": [],
+          "busted": true,
+          "frozen": false,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "flip7-texte",
+  "version": "1.0.0",
+  "description": "Jeu Flip 7 multi-joueurs en mode texte Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js"
+  },
+  "keywords": ["flip7", "jeu-cartes", "nodejs", "webrtc"],
+  "author": "TonNom",
+  "license": "MIT"
+}
