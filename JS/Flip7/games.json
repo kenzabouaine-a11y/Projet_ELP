@@ -2,7 +2,7 @@
   "games": [
     {
       "id": 1,
-      "date": "2026-01-30T12:59:59.112Z",
+      "date": "2026-01-30T13:21:54.848Z",
       "numPlayers": 2,
       "players": [
         {
@@ -17,18 +17,22 @@
         },
         {
           "name": "Joueur 2",
-          "numberCards": [],
-          "modifiers": [
+          "numberCards": [
             {
-              "type": "modifier",
-              "kind": "plus6"
+              "type": "number",
+              "value": 4
+            },
+            {
+              "type": "number",
+              "value": 11
             }
           ],
+          "modifiers": [],
           "busted": false,
           "frozen": false,
           "stopped": true,
-          "roundScore": 6,
-          "totalScore": 6
+          "roundScore": 15,
+          "totalScore": 15
         }
       ]
     }
