@@ -23,60 +23,67 @@ class GameLogger {
   /**
    * Charge l'historique depuis le fichier
    * Si le fichier n'existe pas ou est invalide, démarre avec un historique vide
-   * (Ne lance pas d'erreur, affiche juste un message)
    */
   load() {
     try {
       const content = fs.readFileSync(this.filename, "utf8");
       this.data = JSON.parse(content);
     } catch (err) {
-      // Fichier manquant ou JSON invalide → démarre avec historique vide
       console.log("📁 Nouveau fichier games.json");
+      this.data = { games: [] };
     }
   }
 
   /**
    * Sauvegarde une manche complétée dans l'historique
-   * 
-   * Données sauvegardées par manche :
-   * - ID de la manche
-   * - Date et heure
-   * - Nombre de joueurs
-   * - État final de chaque joueur (cartes, scores, états)
-   * 
+   *
    * @param {number} numPlayers - Nombre de joueurs
    * @param {Array<PlayerState>} players - Les joueurs avec leur état final
    */
   saveRound(numPlayers, players) {
-    // ID = numéro séquentiel basé sur le nombre de manches précédentes
     const gameId = this.data.games.length + 1;
-    
-    // Prépare les données de la manche
+
     const roundData = {
       id: gameId,
-      date: new Date().toISOString(), // Format ISO 8601 pour la date/heure
+      date: new Date().toISOString(),
       numPlayers,
-      // Extrait les informations pertinentes de chaque joueur
       players: players.map((p) => ({
         name: p.name,
-        // Sauvegarde uniquement la structure des cartes (pas les objets complets)
-        numberCards: p.numberCards.map((c) => ({ type: "number", value: c.value })),
-        modifiers: p.modifiers.map((m) => ({ type: "modifier", kind: m.kind })),
-        // État du joueur
-        busted: p.busted,      // Éliminé (doublon sans protection)
-        frozen: p.frozen,      // Gelé (Freeze)
-        stopped: p.stopped,    // Arrêté volontairement
+
+        // Cartes
+        numberCards: p.numberCards.map((c) => ({
+          type: "number",
+          value: c.value,
+        })),
+        modifiers: p.modifiers.map((m) => ({
+          type: "modifier",
+          kind: m.kind,
+        })),
+
+        // États
+        busted: p.busted,
+        frozen: p.frozen,
+        stopped: p.stopped,
+
         // Scores
-        roundScore: p.computeRoundScore(), // Score de cette manche
-        totalScore: p.totalScore            // Score cumulé jusqu'à présent
-      }))
+        
+        roundScore:
+          typeof p.lastRoundScore === "number"
+            ? p.lastRoundScore
+            : p.computeRoundScore(),
+
+        totalScore: p.totalScore,
+      })),
     };
 
-    // Ajoute la manche à l'historique
     this.data.games.push(roundData);
-    
-    // Sauvegarde dans le fichier (formaté avec indentation pour lisibilité)
-    fs.writeFileSync(this.filename, JSON.stringify(this.data, null, 2), "utf8");
+
+    fs.writeFileSync(
+      this.filename,
+      JSON.stringify(this.data, null, 2),
+      "utf8"
+    );
+
     console.log(`📝 Manche ${gameId} sauvée (${this.filename})`);
   }
 }
