@@ -196,7 +196,7 @@ async function main() {
 
     await dealInitialCardsInteractive(rl, round);
 
-    console.log(`\n${colors.magenta}${colors.bright}╔════════ MANCHE ${manceNum} ════════╗${colors.reset}`);
+    console.log(`\n${colors.magenta}${colors.bright}╔════════ MANCHE ${manceNum} ═════════════╗${colors.reset}`);
     console.log(`${colors.magenta}${colors.bright}║${colors.reset} `, round.players.map((p) => getPlayerStatus(p)).join(`  ${colors.magenta}║${colors.reset} `), colors.reset);
     console.log(`${colors.magenta}${colors.bright}╚════════════════════════════════╝${colors.reset}\n`);
 
