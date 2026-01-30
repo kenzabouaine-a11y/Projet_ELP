@@ -1,12 +1,12 @@
-# 🎴 Flip 7 - Jeu de Cartes Texte
+#  Flip 7 - Jeu de Cartes Texte
 
 Un jeu de cartes multi-joueurs en mode texte pour Node.js, où l'objectif est d'être le premier à atteindre **200 points**.
 
-## 🎮 Description
+## Description
 
 **Flip 7** est un jeu de cartes basé sur la gestion du risque et la stratégie. Les joueurs piochent des cartes et accumulent des points, mais doivent faire attention aux doublons qui peuvent les éliminer. L'originalité du jeu réside dans les **cartes d'action** qui offrent des bonus ou des pénalités spectaculaires.
 
-## 🚀 Démarrage Rapide
+## Démarrage Rapide
 
 ### Installation
 
@@ -30,23 +30,23 @@ node index.js
 
 Le jeu vous demande le nombre de joueurs, puis lance le jeu en mode interactif.
 
-## 📋 Règles du Jeu
+## Règles du Jeu
 
 ### Objectif
 Être le premier joueur à atteindre **200 points** cumulés sur plusieurs manches.
 
 ### Composition du Paquet (96 cartes)
 
-#### 🔢 Cartes Nombres (79 cartes)
+#### Cartes Nombres (79 cartes)
 - **0** : 1 copie
 - **1 à 12** : N copies chacune (ex: le 5 a 5 copies)
 - Les nombres sont additionnés pour calculer le score
 
-#### ➕ Modificateurs (10 cartes)
+#### Modificateurs (10 cartes)
 - **+2, +4, +6, +8, +10** : Ajoutent des points au score
 - **×2** : Multiplie le score total par 2
 
-#### ⚡ Actions Spéciales (7 cartes)
+#### Actions Spéciales (7 cartes)
 - **Freeze (Gel)** : Élimine le joueur cible → 0 point
 - **FlipThree** : Le joueur cible pioche 3 cartes bonus
 - **SecondChance** : Le joueur cible est protégé contre 1 doublon
@@ -65,17 +65,17 @@ Le jeu vous demande le nombre de joueurs, puis lance le jeu en mode interactif.
 
 ### Règles Clés
 
-#### 🔴 Doublon = Éliminé
+#### Doublon = Éliminé
 Si vous pichez une carte avec une valeur que vous avez déjà :
 - **Avec SecondChance** : La carte est défaussée, vous gardez votre main
 - **Sans SecondChance** : Vous êtes busted (éliminé) = **0 point**
 
-#### 🎉 Flip 7 = Fin de Manche
+#### Flip 7 = Fin de Manche
 Si vous avez **7 valeurs uniques ou plus** :
 - La manche s'arrête immédiatement
 - Les autres joueurs continuent normalement
 
-#### ❄️ Actions Spéciales
+#### Actions Spéciales
 - **Freeze** : Gèle le joueur cible (éliminé) = 0 point
 - **FlipThree** : Le joueur cible pioche 3 cartes supplémentaires
 - **SecondChance** : Le joueur cible est protégé contre 1 doublon
@@ -84,7 +84,7 @@ Si vous avez **7 valeurs uniques ou plus** :
 
 **Lors d'une action** : Vous devez choisir la cible parmi les joueurs actifs (page 2). L'action s'applique immédiatement à la cible.
 
-#### 📊 Calcul du Score
+#### Calcul du Score
 ```
 Score = Somme des nombres + Modificateurs + Bonus Flip 7
 ```
@@ -95,7 +95,7 @@ Exemple :
 
 Si vous avez 7+ valeurs uniques → **+15 points bonus**
 
-## 📁 Structure du Projet
+## Structure du Projet
 
 ```
 Flip7/
@@ -186,14 +186,14 @@ Tableau clair et coloré avec classement :
 ╚═══════════════════════════════════════════╝
 ```
 
-## 🎯 Exemple de Partie
+## Exemple de Partie
 
 ```
-🆕 NOUVELLE PARTIE (historique effacé)
+ NOUVELLE PARTIE (historique effacé)
 Nombre de joueurs : 2
 
 ════════════════════════════
-🎮 FLIP 7 - 2 joueurs
+ FLIP 7 - 2 joueurs
 ════════════════════════════
 
 ╔════════ MANCHE 1 ════════╗
@@ -227,12 +227,12 @@ Nouvelle manche...
 (Manche 2, 3, ... jusqu'à atteindre 200 pts)
 
 ╔════════════════════════════════════════════╗
-║  🏆  JOUEUR 1 GAGNE !                      ║
+║    JOUEUR 1 GAGNE !                      ║
 ║  205 pts                                   ║
 ╚════════════════════════════════════════════╝
 ```
 
-## 📊 Historique des Manches
+##  Historique des Manches
 
 Chaque manche est sauvegardée dans `games.json` avec :
 - ID et date
