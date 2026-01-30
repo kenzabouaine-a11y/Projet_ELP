@@ -46,7 +46,7 @@ function askQuestion(rl, text) {
 }
 
 /**
- * ✅ Pose une question Oui/Non et force une réponse valide
+ *  Pose une question Oui/Non et force une réponse valide
  * @returns {Promise<boolean>} true = oui, false = non
  */
 async function askYesNo(rl, text) {
@@ -188,7 +188,7 @@ async function main() {
   console.log(`${colors.cyan}${colors.bright}🎮 FLIP 7 - ${numPlayers} joueurs${colors.reset}`);
   console.log(`${colors.magenta}${colors.bright}════════════════════════════${colors.reset}\n`);
 
-  const playerScores = Array(numPlayers).fill(0);
+  let playerScores = Array(numPlayers).fill(0);
 
   let manceNum = 1;
   while (true) {
@@ -254,6 +254,7 @@ async function main() {
       p.totalScore += rs;
       p.lastRoundScore = rs;
     }
+    playerScores = round.players.map(p => p.totalScore);
 
     const sortedPlayers = [...round.players].sort((a, b) => roundScores.get(b) - roundScores.get(a));
 

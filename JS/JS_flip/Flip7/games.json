@@ -2,46 +2,33 @@
   "games": [
     {
       "id": 1,
-      "date": "2026-01-30T11:49:49.505Z",
+      "date": "2026-01-30T12:59:59.112Z",
       "numPlayers": 2,
       "players": [
         {
           "name": "Joueur 1",
-          "numberCards": [
-            {
-              "type": "number",
-              "value": 10
-            }
-          ],
+          "numberCards": [],
           "modifiers": [],
-          "busted": false,
+          "busted": true,
           "frozen": false,
-          "stopped": true,
-          "roundScore": 10,
-          "totalScore": 10
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
         },
         {
           "name": "Joueur 2",
-          "numberCards": [
+          "numberCards": [],
+          "modifiers": [
             {
-              "type": "number",
-              "value": 3
-            },
-            {
-              "type": "number",
-              "value": 8
-            },
-            {
-              "type": "number",
-              "value": 11
+              "type": "modifier",
+              "kind": "plus6"
             }
           ],
-          "modifiers": [],
           "busted": false,
           "frozen": false,
           "stopped": true,
-          "roundScore": 22,
-          "totalScore": 22
+          "roundScore": 6,
+          "totalScore": 6
         }
       ]
     }
