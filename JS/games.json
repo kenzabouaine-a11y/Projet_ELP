@@ -1,1 +1,143 @@
+<<<<<<< HEAD
 {}
+=======
+{
+  "games": [
+    {
+      "id": 1,
+      "date": "2026-01-30T21:34:58.680Z",
+      "numPlayers": 2,
+      "players": [
+        {
+          "name": "Joueur 1",
+          "numberCards": [],
+          "modifiers": [],
+          "busted": true,
+          "frozen": false,
+          "stopped": false,
+          "roundScore": 0,
+          "totalScore": 0
+        },
+        {
+          "name": "Joueur 2",
+          "numberCards": [
+            {
+              "type": "number",
+              "value": 9
+            }
+          ],
+          "modifiers": [],
+          "busted": false,
+          "frozen": false,
+          "stopped": true,
+          "roundScore": 9,
+          "totalScore": 9
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "date": "2026-01-30T21:35:11.524Z",
+      "numPlayers": 2,
+      "players": [
+        {
+          "name": "Joueur 1",
+          "numberCards": [],
+          "modifiers": [
+            {
+              "type": "modifier",
+              "kind": "plus4"
+            }
+          ],
+          "busted": false,
+          "frozen": false,
+          "stopped": true,
+          "roundScore": 4,
+          "totalScore": 4
+        },
+        {
+          "name": "Joueur 2",
+          "numberCards": [
+            {
+              "type": "number",
+              "value": 12
+            }
+          ],
+          "modifiers": [],
+          "busted": false,
+          "frozen": false,
+          "stopped": true,
+          "roundScore": 12,
+          "totalScore": 21
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "date": "2026-01-30T21:38:52.294Z",
+      "numPlayers": 2,
+      "players": [
+        {
+          "name": "Joueur 1",
+          "numberCards": [
+            {
+              "type": "number",
+              "value": 9
+            },
+            {
+              "type": "number",
+              "value": 8
+            },
+            {
+              "type": "number",
+              "value": 6
+            },
+            {
+              "type": "number",
+              "value": 4
+            },
+            {
+              "type": "number",
+              "value": 12
+            }
+          ],
+          "modifiers": [],
+          "busted": false,
+          "frozen": false,
+          "stopped": true,
+          "roundScore": 39,
+          "totalScore": 43
+        },
+        {
+          "name": "Joueur 2",
+          "numberCards": [
+            {
+              "type": "number",
+              "value": 1
+            },
+            {
+              "type": "number",
+              "value": 12
+            }
+          ],
+          "modifiers": [
+            {
+              "type": "modifier",
+              "kind": "plus10"
+            },
+            {
+              "type": "modifier",
+              "kind": "plus2"
+            }
+          ],
+          "busted": false,
+          "frozen": false,
+          "stopped": true,
+          "roundScore": 25,
+          "totalScore": 46
+        }
+      ]
+    }
+  ]
+}
+>>>>>>> refs/remotes/origin/main
