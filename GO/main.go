@@ -1,179 +1,166 @@
 package main
 
 import (
-    "bufio"
-    "fmt"
-    "log"
-    "net"
-    "os"
-    "strings"
+	"bufio"
+	"flag"
+	"fmt"
+	"net"
+	"os"
+	"runtime"
+	"strings"
+	"time"
 )
 
-// =======================
-// V0 : deux mots en dur
-// =======================
-
-func runV0() {
-    fmt.Println("=== V0 : deux mots en dur ===")
-    fmt.Println("dist(\"test\", \"texte\") avec LevenshteinOld =", LevenshteinOld("test", "texte"))
-    fmt.Println("dist(\"test\", \"texte\") avec Levenshtein     =", Levenshtein("test", "texte"))
-}
-
-// =======================
-// V1 : local, fichier, séquentiel
-// =======================
-
-func runV1() {
-    target := "alice"
-    names := []string{"alice", "alicia", "bob", "robert", "alixe", "alain"}
-
-    fmt.Println("=== V1 : local séquentiel (sans TCP) ===")
-    results := computeDistancesSequential(target, names)
-    for _, r := range results {
-        fmt.Printf("%s -> %d\n", r.Name, r.Distance)
-    }
-}
-
-// Variante V1b : même chose mais en lisant names.txt
-func runV1File() {
-    target := "alice"
-
-    file, err := os.Open("names.txt")
-    if err != nil {
-        log.Fatalf("Erreur ouverture fichier: %v", err)
-    }
-    defer file.Close()
-
-    scanner := bufio.NewScanner(file)
-    var names []string
-    for scanner.Scan() {
-        line := strings.TrimSpace(scanner.Text())
-        if line != "" {
-            names = append(names, line)
-        }
-    }
-    if err := scanner.Err(); err != nil {
-        log.Fatalf("Erreur lecture fichier: %v", err)
-    }
-
-    fmt.Println("=== V1 (fichier) : local séquentiel ===")
-    results := computeDistancesSequential(target, names)
-    for _, r := range results {
-        fmt.Printf("%s -> %d\n", r.Name, r.Distance)
-    }
-}
-
-// =======================
-// V2 : serveur TCP concurrent
-// =======================
-
-func runServerV2() {
-    ln, err := net.Listen("tcp", ":8000")
-    if err != nil {
-        log.Fatalf("Erreur Listen: %v", err)
-    }
-    defer ln.Close()
-
-    log.Println("Serveur TCP Levenshtein en écoute sur le port 8000...")
-
-    for {
-        conn, err := ln.Accept()
-        if err != nil {
-            log.Printf("Erreur Accept: %v", err)
-            continue
-        }
-        go handleClient(conn)
-    }
-}
-
-// handleClient gère UNE connexion client
-func handleClient(conn net.Conn) {
-    defer conn.Close()
-
-    reader := bufio.NewReader(conn)
-
-    line, err := reader.ReadString('\n')
-    if err != nil {
-        log.Printf("Erreur lecture client: %v", err)
-        return
-    }
-
-    line = strings.TrimSpace(line)
-    if line == "" {
-        log.Printf("Ligne vide reçue")
-        return
-    }
-
-    parts := strings.SplitN(line, ";", 2)
-    if len(parts) != 2 {
-        log.Printf("Format incorrect: %s", line)
-        fmt.Fprintln(conn, "ERREUR: format attendu target;nom1,nom2,...")
-        return
-    }
-
-    target := parts[0]
-    namesPart := parts[1]
-
-    if target == "" || namesPart == "" {
-        log.Printf("Target ou liste de noms vide")
-        fmt.Fprintln(conn, "ERREUR: target ou liste de noms vide")
-        return
-    }
-
-    rawNames := strings.Split(namesPart, ",")
-    var names []string
-    for _, n := range rawNames {
-        n = strings.TrimSpace(n)
-        if n != "" {
-            names = append(names, n)
-        }
-    }
-
-    if len(names) == 0 {
-        fmt.Fprintln(conn, "ERREUR: aucun nom fourni")
-        return
-    }
-
-    // V1 (séquentiel) – pour comparaison, si tu veux tester :
-    // results := computeDistancesSequential(target, names)
-
-    // V2 (concurrent) – version finale
-    results := computeDistancesConcurrent(target, names)
-
-    var sb strings.Builder
-    for i, res := range results {
-        if i > 0 {
-            sb.WriteString(",")
-        }
-        sb.WriteString(res.Name)
-        sb.WriteString(":")
-        sb.WriteString(fmt.Sprint(res.Distance))
-    }
-    sb.WriteString("\n")
-
-    _, err = conn.Write([]byte(sb.String()))
-    if err != nil {
-        log.Printf("Erreur écriture vers client: %v", err)
-        return
-    }
-}
-
-// =======================
-// main : sélection de la version
-// =======================
-
 func main() {
-    // Choisis ce que tu veux lancer :
+	mode := flag.String("mode", "server", "server | bench")
+	bench := flag.String("bench", "target", "target | pairs")
+	target := flag.String("target", "alice", "target")
+	k := flag.Int("k", 2000, "nb noms")
+	port := flag.Int("port", 8000, "port TCP")
 
-    // V0 : deux mots
-    // runV0()
+	maxConn := flag.Int("maxconn", 128, "nb max de connexions simultanées")
+	readTimeout := flag.Duration("readTimeout", 5*time.Second, "timeout lecture TCP")
+	writeTimeout := flag.Duration("writeTimeout", 5*time.Second, "timeout écriture TCP")
 
-    // V1 : local séquentiel (tableau en dur)
-    // runV1()
+	flag.Parse()
 
-    // V1b : local séquentiel, lecture de names.txt
-    // runV1File()
+	// Bench: on a besoin de names.txt
+	if *mode == "bench" {
+		names, err := loadNames("names.txt", *k)
+		if err != nil {
+			fmt.Println("Erreur lecture names.txt:", err)
+			return
+		}
+		counts := []int{1, 4, 8, 16, 32}
 
-    // V2 : serveur TCP concurrent (version finale que tu utilises pour le projet)
-    runServerV2()
+		if *bench == "pairs" {
+			benchmarkAllPairs(names, counts)
+		} else {
+			benchmarkTargetVsNames(*target, names, counts)
+		}
+		return
+	}
+
+	// Server: pool global partagé
+	pool := NewWorkerPool(runtime.NumCPU(), runtime.NumCPU()*8)
+	defer pool.Close()
+
+	if err := startServer(*port, *maxConn, *readTimeout, *writeTimeout, pool); err != nil {
+		fmt.Println("Erreur serveur:", err)
+	}
+}
+
+func loadNames(path string, limit int) ([]string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	sc := bufio.NewScanner(f)
+	var names []string
+	for sc.Scan() {
+		if limit > 0 && len(names) >= limit {
+			break
+		}
+		s := strings.TrimSpace(sc.Text())
+		if s != "" {
+			names = append(names, s)
+		}
+	}
+	if err := sc.Err(); err != nil {
+		return nil, err
+	}
+	return names, nil
+}
+
+func startServer(port int, maxConn int, readTimeout, writeTimeout time.Duration, pool *WorkerPool) error {
+	addr := fmt.Sprintf(":%d", port)
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return fmt.Errorf("impossible d'écouter sur %s : %w", addr, err)
+	}
+	defer ln.Close()
+
+	if maxConn <= 0 {
+		maxConn = 128
+	}
+	sem := make(chan struct{}, maxConn) // limiteur de sessions
+
+	fmt.Printf("Serveur TCP sur le port %d (maxConn=%d)\n", port, maxConn)
+
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			fmt.Println("Erreur Accept:", err)
+			continue
+		}
+
+		sem <- struct{}{} // bloque si trop de connexions actives
+		go func(c net.Conn) {
+			defer func() { <-sem }()
+			handleClient(c, readTimeout, writeTimeout, pool)
+		}(conn)
+	}
+}
+
+func handleClient(conn net.Conn, readTimeout, writeTimeout time.Duration, pool *WorkerPool) {
+	defer conn.Close()
+
+	_ = conn.SetReadDeadline(time.Now().Add(readTimeout))
+	_ = conn.SetWriteDeadline(time.Now().Add(writeTimeout))
+
+	// Lecture bornée : 1 MiB max
+	sc := bufio.NewScanner(conn)
+	sc.Buffer(make([]byte, 0, 4096), 1<<20)
+
+	if ok := sc.Scan(); !ok {
+		fmt.Fprintln(conn, "ERREUR: lecture requête (vide / timeout / trop long)")
+		return
+	}
+	line := strings.TrimSpace(sc.Text())
+	if line == "" {
+		fmt.Fprintln(conn, "ERREUR: requête vide (format: target;nom1,nom2,...)")
+		return
+	}
+
+	// Format: target;nom1,nom2,nom3
+	parts := strings.SplitN(line, ";", 2)
+	if len(parts) != 2 {
+		fmt.Fprintln(conn, "ERREUR: format attendu target;nom1,nom2,...")
+		return
+	}
+
+	target := strings.TrimSpace(parts[0])
+	list := strings.TrimSpace(parts[1])
+	if target == "" || list == "" {
+		fmt.Fprintln(conn, "ERREUR: target ou liste vide")
+		return
+	}
+
+	raw := strings.Split(list, ",")
+	names := make([]string, 0, len(raw))
+	for _, n := range raw {
+		n = strings.TrimSpace(n)
+		if n != "" {
+			names = append(names, n)
+		}
+	}
+	if len(names) == 0 {
+		fmt.Fprintln(conn, "ERREUR: aucun nom valide")
+		return
+	}
+
+	res := computeDistancesWithPool(pool, target, names)
+
+	// Réponse : "name:dist name:dist ..."
+	var sb strings.Builder
+	for _, r := range res {
+		sb.WriteString(r.Name)
+		sb.WriteString(":")
+		sb.WriteString(fmt.Sprint(r.Distance))
+		sb.WriteString(" ")
+	}
+	sb.WriteString("\n")
+	_, _ = conn.Write([]byte(sb.String()))
 }

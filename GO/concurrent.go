@@ -1,66 +1,261 @@
 package main
 
-import "sync"
+import (
+	"fmt"
+	"runtime"
+	"sync"
+	"time"
+)
 
 type Result struct {
-    Name     string
-    Distance int
+	Index    int
+	Name     string
+	Distance int
 }
 
-type Job struct {
-    Target string
-    Name   string
+// =====================================================
+// Utils
+// =====================================================
+
+func maxInt(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
-// V1 : calcul séquentiel (sans goroutines)
+// =====================================================
+// Target vs Names
+// =====================================================
+
 func computeDistancesSequential(target string, names []string) []Result {
-    out := make([]Result, 0, len(names))
-    for _, name := range names {
-        d := Levenshtein(target, name) // ou LevenshteinOld si tu veux comparer
-        out = append(out, Result{Name: name, Distance: d})
-    }
-    return out
+	out := make([]Result, len(names))
+	for i, name := range names {
+		out[i] = Result{
+			Index:    i,
+			Name:     name,
+			Distance: Levenshtein(target, name),
+		}
+	}
+	return out
 }
 
-// V2 : calcul concurrent avec worker pool
-func computeDistancesConcurrent(target string, names []string) []Result {
-    const workerCount = 4
+// Version concurrente CHUNKÉE (efficace)
+func computeDistancesConcurrentWithWorkers(target string, names []string, workerCount int) []Result {
+	n := len(names)
+	if n == 0 {
+		return nil
+	}
 
-    jobs := make(chan Job)
-    results := make(chan Result)
+	if workerCount <= 0 {
+		workerCount = runtime.NumCPU()
+	}
+	if workerCount > n {
+		workerCount = n
+	}
 
-    var wg sync.WaitGroup
+	chunkSize := maxInt(64, n/(workerCount*4))
+	if chunkSize > 2048 {
+		chunkSize = 2048
+	}
 
-    wg.Add(workerCount)
-    for i := 0; i < workerCount; i++ {
-        go worker(jobs, results, &wg)
-    }
+	type Job struct {
+		Start int
+		End   int
+	}
 
-    go func() {
-        for _, name := range names {
-            jobs <- Job{Target: target, Name: name}
-        }
-        close(jobs)
-    }()
+	jobs := make(chan Job, workerCount*2)
+	results := make(chan []Result, workerCount*2)
 
-    go func() {
-        wg.Wait()
-        close(results)
-    }()
+	var wg sync.WaitGroup
+	wg.Add(workerCount)
 
-    var out []Result
-    for res := range results {
-        out = append(out, res)
-    }
+	for w := 0; w < workerCount; w++ {
+		go func() {
+			defer wg.Done()
+			for job := range jobs {
+				local := make([]Result, 0, job.End-job.Start)
+				for i := job.Start; i < job.End; i++ {
+					local = append(local, Result{
+						Index:    i,
+						Name:     names[i],
+						Distance: Levenshtein(target, names[i]),
+					})
+				}
+				results <- local
+			}
+		}()
+	}
 
-    return out
+	go func() {
+		for start := 0; start < n; start += chunkSize {
+			end := start + chunkSize
+			if end > n {
+				end = n
+			}
+			jobs <- Job{Start: start, End: end}
+		}
+		close(jobs)
+	}()
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	out := make([]Result, n)
+	for batch := range results {
+		for _, r := range batch {
+			out[r.Index] = r
+		}
+	}
+	return out
 }
 
-func worker(jobs <-chan Job, results chan<- Result, wg *sync.WaitGroup) {
-    defer wg.Done()
+// =====================================================
+// ALL PAIRS
+// =====================================================
 
-    for job := range jobs {
-        d := Levenshtein(job.Target, job.Name)
-        results <- Result{Name: job.Name, Distance: d}
-    }
+func sumAllPairsSequential(names []string) int {
+	sum := 0
+	for i := 0; i < len(names); i++ {
+		for j := i + 1; j < len(names); j++ {
+			sum += Levenshtein(names[i], names[j])
+		}
+	}
+	return sum
+}
+
+func sumAllPairsConcurrent(names []string, workerCount int) int {
+	n := len(names)
+	if n < 2 {
+		return 0
+	}
+
+	if workerCount <= 0 {
+		workerCount = runtime.NumCPU()
+	}
+
+	chunkSize := maxInt(16, n/(workerCount*4))
+	if chunkSize > 256 {
+		chunkSize = 256
+	}
+
+	type Job struct {
+		Start int
+		End   int
+	}
+
+	jobs := make(chan Job, workerCount*2)
+	results := make(chan int, workerCount*2)
+
+	var wg sync.WaitGroup
+	wg.Add(workerCount)
+
+	for w := 0; w < workerCount; w++ {
+		go func() {
+			defer wg.Done()
+			local := 0
+			for job := range jobs {
+				for i := job.Start; i < job.End; i++ {
+					for j := i + 1; j < n; j++ {
+						local += Levenshtein(names[i], names[j])
+					}
+				}
+			}
+			results <- local
+		}()
+	}
+
+	go func() {
+		for i := 0; i < n; i += chunkSize {
+			end := i + chunkSize
+			if end > n {
+				end = n
+			}
+			jobs <- Job{Start: i, End: end}
+		}
+		close(jobs)
+	}()
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	sum := 0
+	for v := range results {
+		sum += v
+	}
+	return sum
+}
+
+// =====================================================
+// Bench utils
+// =====================================================
+
+func benchMedian(iters int, fn func()) time.Duration {
+	for i := 0; i < 5; i++ {
+		fn()
+	}
+	durs := make([]time.Duration, 0, iters)
+	for i := 0; i < iters; i++ {
+		start := time.Now()
+		fn()
+		durs = append(durs, time.Since(start))
+	}
+	for i := 0; i < len(durs); i++ {
+		for j := i + 1; j < len(durs); j++ {
+			if durs[j] < durs[i] {
+				durs[i], durs[j] = durs[j], durs[i]
+			}
+		}
+	}
+	return durs[len(durs)/2]
+}
+
+// =====================================================
+// Benchmarks
+// =====================================================
+
+func benchmarkTargetVsNames(target string, names []string, counts []int) {
+	iters := 50
+	fmt.Printf("Benchmark target-vs-names sur %d noms\n", len(names))
+
+	durSeq := benchMedian(iters, func() {
+		_ = computeDistancesSequential(target, names)
+	})
+	fmt.Printf("Séquentiel : %v\n", durSeq)
+
+	for _, wc := range counts {
+		dur := benchMedian(iters, func() {
+			_ = computeDistancesConcurrentWithWorkers(target, names, wc)
+		})
+		fmt.Printf("Concurrent (%2d workers) : %v (ratio=%.2fx)\n",
+			wc, dur, float64(durSeq)/float64(dur))
+	}
+}
+
+func benchmarkAllPairs(names []string, counts []int) {
+	iters := 10
+	fmt.Printf("Benchmark all-pairs (%d noms)\n", len(names))
+
+	check := sumAllPairsSequential(names)
+	durSeq := benchMedian(iters, func() {
+		_ = sumAllPairsSequential(names)
+	})
+	fmt.Printf("Séquentiel : %v\n", durSeq)
+
+	for _, wc := range counts {
+		var res int
+		dur := benchMedian(iters, func() {
+			res = sumAllPairsConcurrent(names, wc)
+		})
+		ok := "OK"
+		if res != check {
+			ok = "DIFF"
+		}
+		fmt.Printf("Concurrent (%2d workers) : %v (ratio=%.2fx) [%s]\n",
+			wc, dur, float64(durSeq)/float64(dur), ok)
+	}
 }

@@ -2,69 +2,6 @@ package main
 
 import "unicode/utf8"
 
-//////////////////////////
-// Ancienne version (2D)
-//////////////////////////
-
-// LevenshteinOld calcule la distance d'édition entre deux chaînes a et b
-// avec une matrice 2D de taille O(len(a)*len(b)).
-// Gardé pour l'historique / comparaison.
-func LevenshteinOld(a, b string) int {
-    la := len(a)
-    lb := len(b)
-
-    // Si une des chaînes est vide
-    if la == 0 {
-        return lb
-    }
-    if lb == 0 {
-        return la
-    }
-
-    // Matrice (la+1) x (lb+1)
-    dp := make([][]int, la+1)
-    for i := 0; i <= la; i++ {
-        dp[i] = make([]int, lb+1)
-    }
-
-    // Initialisation de la première ligne / colonne
-    for i := 0; i <= la; i++ {
-        dp[i][0] = i
-    }
-    for j := 0; j <= lb; j++ {
-        dp[0][j] = j
-    }
-
-    // Remplir la matrice
-    for i := 1; i <= la; i++ {
-        for j := 1; j <= lb; j++ {
-            cost := 0
-            if a[i-1] != b[j-1] {
-                cost = 1
-            }
-
-            deletion := dp[i-1][j] + 1
-            insertion := dp[i][j-1] + 1
-            substitution := dp[i-1][j-1] + cost
-
-            dp[i][j] = min3(deletion, insertion, substitution)
-        }
-    }
-
-    return dp[la][lb]
-}
-
-// min3 renvoie le minimum de trois entiers.
-func min3(a, b, c int) int {
-    m := a
-    if b < m {
-        m = b
-    }
-    if c < m {
-        m = c
-    }
-    return m
-}
 
 /////////////////////////////
 // Nouvelle version optimisée
