@@ -1,7 +1,5 @@
 package main
 
-import "unicode/utf8"
-
 
 /////////////////////////////
 // Nouvelle version optimisée
@@ -13,21 +11,15 @@ const minLengthThreshold = 32
 
 // Levenshtein calcule la distance de Levenshtein entre a et b
 // avec une DP 1D O(min(len(a), len(b))) et quelques optimisations.
-func Levenshtein(a, b string) int {
-    // Gestion des cas simples
-    if len(a) == 0 {
-        return utf8.RuneCountInString(b)
-    }
-    if len(b) == 0 {
-        return utf8.RuneCountInString(a)
-    }
-    if a == b {
-        return 0
-    }
+// On renomme ou on change la signature
 
-    // Conversion en runes pour bien gérer l'Unicode
-    s1 := []rune(a)
-    s2 := []rune(b)
+func Levenshtein(s1, s2 []rune) int { // Reçoit des []rune directement
+    if len(s1) == 0 {
+        return len(s2)
+    }
+    if len(s2) == 0 {
+        return len(s1)
+    }
 
     // On met la plus courte dans s1 pour minimiser la mémoire
     if len(s1) > len(s2) {

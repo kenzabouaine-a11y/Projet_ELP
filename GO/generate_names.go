@@ -2,19 +2,21 @@ package main
 
 import (
     "fmt"
-    "os"
+    "math/rand" 
+    "os"    
 )
 
 func main() {
-    // Crée (ou écrase) un fichier names.txt dans le dossier courant
-    f, err := os.Create("names.txt")
-    if err != nil {
-        panic(err)
-    }
+    f, _ := os.Create("names.txt")
     defer f.Close()
 
-    // Écrit 10 000 lignes : name_0, name_1, ..., name_9999
-    for i := 0; i < 100000; i++ {
-        fmt.Fprintf(f, "name_%d\n", i)
+    // Génère des noms aléatoires de longueurs différentes
+    for i := 0; i < 10000; i++ {
+        length := 5 + rand.Intn(10)
+        b := make([]byte, length)
+        for j := range b {
+            b[j] = byte('a' + rand.Intn(26))
+        }
+        fmt.Fprintf(f, "%s\n", string(b))
     }
 }

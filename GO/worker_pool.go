@@ -7,20 +7,21 @@ import (
 
 // WorkerPool est un pool GLOBAL (persistant) de workers.
 // Il évite de recréer des goroutines à chaque requête côté serveur.
-// Les benchmarks peuvent continuer à utiliser computeDistancesConcurrentWithWorkers.
-
 type chunkJob struct {
-	target string
-	names  []string
+	target []rune   // CHANGEMENT : Utilise des runes pour la performance
+	names  [][]rune // CHANGEMENT : Liste de noms déjà convertis en runes
+	rawNames []string // Gardé pour remplir le champ 'Name' du Result
 	start  int
 	end    int
 	out    chan<- []Result
 }
 
 type WorkerPool struct {
-	jobs chan chunkJob
-	wg   sync.WaitGroup
+    jobs        chan chunkJob
+    workerCount int
+    wg          sync.WaitGroup
 }
+
 
 func NewWorkerPool(workerCount int, queueSize int) *WorkerPool {
 	if workerCount <= 0 {
@@ -30,7 +31,11 @@ func NewWorkerPool(workerCount int, queueSize int) *WorkerPool {
 		queueSize = workerCount * 8
 	}
 
-	p := &WorkerPool{jobs: make(chan chunkJob, queueSize)}
+	p := &WorkerPool{
+    jobs:        make(chan chunkJob, queueSize),
+    workerCount: workerCount,
+	}
+
 	p.wg.Add(workerCount)
 
 	for i := 0; i < workerCount; i++ {
@@ -39,11 +44,11 @@ func NewWorkerPool(workerCount int, queueSize int) *WorkerPool {
 			for job := range p.jobs {
 				local := make([]Result, 0, job.end-job.start)
 				for idx := job.start; idx < job.end; idx++ {
-					name := job.names[idx]
+					// Utilisation de la version optimisée avec []rune
 					local = append(local, Result{
 						Index:    idx,
-						Name:     name,
-						Distance: Levenshtein(job.target, name),
+						Name:     job.rawNames[idx],
+						Distance: Levenshtein(job.target, job.names[idx]),
 					})
 				}
 				job.out <- local
@@ -59,18 +64,23 @@ func (p *WorkerPool) Close() {
 	p.wg.Wait()
 }
 
-// computeDistancesWithPool découpe en chunks et délègue chaque chunk au pool.
 func computeDistancesWithPool(pool *WorkerPool, target string, names []string) []Result {
 	n := len(names)
 	if n == 0 {
 		return nil
 	}
 
-	// Chunking proche de votre version locale (efficace).
-	workerCount := runtime.NumCPU()
+	targetRunes := []rune(target)
+	namesRunes := make([][]rune, n)
+	for i, name := range names {
+		namesRunes[i] = []rune(name)
+	}
+
+	workerCount := pool.workerCount
 	if workerCount > n {
 		workerCount = n
 	}
+
 	chunkSize := maxInt(64, n/(workerCount*4))
 	if chunkSize > 2048 {
 		chunkSize = 2048
@@ -78,13 +88,22 @@ func computeDistancesWithPool(pool *WorkerPool, target string, names []string) [
 
 	jobCount := 0
 	outCh := make(chan []Result, workerCount*2)
+
 	for start := 0; start < n; start += chunkSize {
 		end := start + chunkSize
 		if end > n {
 			end = n
 		}
 		jobCount++
-		pool.jobs <- chunkJob{target: target, names: names, start: start, end: end, out: outCh}
+
+		pool.jobs <- chunkJob{
+			target:   targetRunes,
+			names:    namesRunes,
+			rawNames: names,
+			start:    start,
+			end:      end,
+			out:      outCh,
+		}
 	}
 
 	out := make([]Result, n)

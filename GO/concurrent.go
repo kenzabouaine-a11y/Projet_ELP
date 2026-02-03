@@ -29,22 +29,31 @@ func maxInt(a, b int) int {
 // =====================================================
 
 func computeDistancesSequential(target string, names []string) []Result {
+	// Conversion unique pour le séquentiel aussi pour un benchmark juste
+	targetRunes := []rune(target)
 	out := make([]Result, len(names))
 	for i, name := range names {
 		out[i] = Result{
 			Index:    i,
 			Name:     name,
-			Distance: Levenshtein(target, name),
+			Distance: Levenshtein([]rune(name), targetRunes),
 		}
 	}
 	return out
 }
 
-// Version concurrente CHUNKÉE (efficace)
+// Version concurrente CHUNKÉE corrigée
 func computeDistancesConcurrentWithWorkers(target string, names []string, workerCount int) []Result {
 	n := len(names)
 	if n == 0 {
 		return nil
+	}
+
+	// --- CORRECTION : Conversion unique avant la concurrence ---
+	targetRunes := []rune(target)
+	namesRunes := make([][]rune, n)
+	for i, name := range names {
+		namesRunes[i] = []rune(name)
 	}
 
 	if workerCount <= 0 {
@@ -79,7 +88,8 @@ func computeDistancesConcurrentWithWorkers(target string, names []string, worker
 					local = append(local, Result{
 						Index:    i,
 						Name:     names[i],
-						Distance: Levenshtein(target, names[i]),
+						// --- CORRECTION : Utilisation des runes pré-converties ---
+						Distance: Levenshtein(targetRunes, namesRunes[i]),
 					})
 				}
 				results <- local
@@ -113,14 +123,20 @@ func computeDistancesConcurrentWithWorkers(target string, names []string, worker
 }
 
 // =====================================================
-// ALL PAIRS
+// ALL PAIRS (Corrigé également pour les runes)
 // =====================================================
 
 func sumAllPairsSequential(names []string) int {
+	n := len(names)
+	namesRunes := make([][]rune, n)
+	for i, name := range names {
+		namesRunes[i] = []rune(name)
+	}
+
 	sum := 0
-	for i := 0; i < len(names); i++ {
-		for j := i + 1; j < len(names); j++ {
-			sum += Levenshtein(names[i], names[j])
+	for i := 0; i < n; i++ {
+		for j := i + 1; j < n; j++ {
+			sum += Levenshtein(namesRunes[i], namesRunes[j])
 		}
 	}
 	return sum
@@ -130,6 +146,12 @@ func sumAllPairsConcurrent(names []string, workerCount int) int {
 	n := len(names)
 	if n < 2 {
 		return 0
+	}
+
+	// Pré-conversion
+	namesRunes := make([][]rune, n)
+	for i, name := range names {
+		namesRunes[i] = []rune(name)
 	}
 
 	if workerCount <= 0 {
@@ -159,7 +181,8 @@ func sumAllPairsConcurrent(names []string, workerCount int) int {
 			for job := range jobs {
 				for i := job.Start; i < job.End; i++ {
 					for j := i + 1; j < n; j++ {
-						local += Levenshtein(names[i], names[j])
+						// Utilisation des runes
+						local += Levenshtein(namesRunes[i], namesRunes[j])
 					}
 				}
 			}
@@ -189,6 +212,8 @@ func sumAllPairsConcurrent(names []string, workerCount int) int {
 	}
 	return sum
 }
+
+
 
 // =====================================================
 // Bench utils

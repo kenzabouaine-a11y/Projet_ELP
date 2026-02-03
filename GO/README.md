@@ -1,50 +1,101 @@
-Go Levenshtein — Concurrence & TCP
+# Go Levenshtein — Concurrence & Serveur TCP
 
-Description
-Projet Go calculant des distances de Levenshtein :
+##  Description générale
 
-en local (benchmark de performances),
+Ce projet implémente le calcul de la **distance de Levenshtein** en **Go**, en mettant l’accent sur :
 
-via un serveur TCP accessible par un client.
+- La **concurrence** (goroutines, channels, worker pool).
+- La **mesure de performance** (benchmarks).
+- Une **architecture client / serveur TCP**.
+- La **robustesse réseau** (timeouts, limitation de connexions).
+- Une **amélioration fonctionnelle** via un filtrage des résultats.
 
-Le calcul utilise un pool de workers (concurrence).
+Le projet illustre des concepts fondamentaux de Go vus en cours.
 
-Prérequis
+---
 
-Go ≥ 1.20
+##  Distance de Levenshtein (rappel)
 
-Fichier names.txt (un nom par ligne)
+La distance de Levenshtein entre deux chaînes correspond au **nombre minimal d’opérations** nécessaires pour transformer l’une en l’autre (insertion, suppression, substitution de caractères).
 
-Lancer les benchmarks
+Exemple (cible : `alice`) :
 
-Target vs liste de noms
-Commande :
-go run main.go concurrent.go levenshtein.go -mode=bench -bench=target -k=10000 -target=alice
+| Mot     | Distance |
+|--------|----------|
+| alicia | 2        |
+| bob    | 3        |
+| alex   | 4        |
 
-All-pairs (comparaison entre tous les noms)
-Commande :
-go run main.go concurrent.go levenshtein.go -mode=bench -bench=pairs -k=2000
+---
 
-Lancer le serveur TCP
-Commande :
-go run main.go concurrent.go levenshtein.go -mode=server
+##  Fonctionnalités principales
 
-Le serveur écoute sur le port 8000 par défaut.
+- **Calcul optimisé** : Utilisation de `[]rune` pour minimiser les allocations et gérer l'Unicode.
+- **Concurrence** : Distribution des calculs via goroutines et channels.
+- **Worker pool** :
+  - **Éphémère** : Pour les benchmarks locaux.
+  - **Persistant** : Pour le serveur TCP (créé une seule fois au démarrage).
+- **Serveur TCP** : Multi-clients avec limitation de connexions simultanées.
+- **Gestion des Timeouts** : Délais de lecture et d'écriture pour éviter les connexions fantômes.
 
-Lancer le client
-Dans un autre terminal :
+---
+
+##  Structure du projet
+
+> ⚠️ Il ne faut **PAS** utiliser `go run .` car le projet contient plusieurs fonctions `main()`.
+
+- `main.go` : Serveur TCP et lanceur de benchmarks.
+- `concurrent.go` : Algorithme concurrent par chunks.
+- `worker_pool.go` : Gestion du pool de workers persistant.
+- `levenshtein.go` : Logique de calcul pure.
+- `client.go` : Client interactif pour tester le serveur.
+- `generate_names.go` : Générateur de données de test.
+
+---
+
+##  Mode Benchmark (local)
+
+###  Target vs liste de noms
+Calcule la distance entre une cible et une liste de noms.
+```bash
+go run main.go concurrent.go levenshtein.go worker_pool.go -mode=bench -bench=target -k=10000 -target=alice
+```
+### All-pairs (comparaison complète)
+Calcule toutes les distances entre tous les noms (très coûteux).
+```bash
+go run main.go concurrent.go levenshtein.go worker_pool.go -mode=bench -bench=pairs -k=1000
+```
+---
+
+## Serveur TCP
+Le serveur utilise un pool de workers persistant partagé entre tous les clients.
+### Lancer le serveur
+```bash
+go run main.go concurrent.go levenshtein.go worker_pool.go -mode=server -port=8000
+```
+### Options du serveur
+| Flag        |Description        |Défaut   |
+-------------- ------------------- ----------
+|port         |Port TCP           |8000     |
+|maxconn      |Connexions max     |128      |
+|readTimeout  |Timeout lecture    |5s       |
+|writeTimeout |Timeout écriture   |5s       |
+
+### Client TCP
+#### Lancer le client
+```bash
 go run client.go
+```
+#### Format de requête
+cible;nom1,nom2,nom3
 
-Entrer une requête au format :
-target;nom1,nom2,nom3
+---
 
-Exemple :
-alice;bob,alicia,alex
+## Choix techniques & Justification
+1-Worker pool persistant : Évite la création répétée de goroutines, stabilisant les ressources serveur.
 
-Résumé
+2-Utilisation des Runes : Conversion unique en []rune pour maximiser la vitesse de calcul (Objectif "Faster").
 
-mode=bench : tester les performances du calcul concurrent
+3-Sémaphore de connexion : Utilisation d'un canal tamponné pour limiter les fichiers ouverts (ulimit -n).
 
-mode=server : lancer le serveur TCP
 
-client.go : envoyer une requête au serveur
