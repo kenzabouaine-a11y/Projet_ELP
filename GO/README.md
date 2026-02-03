@@ -33,8 +33,8 @@ Exemple (cible : `alice`) :
 - **Calcul optimisé** : Utilisation de `[]rune` pour minimiser les allocations et gérer l'Unicode.
 - **Concurrence** : Distribution des calculs via goroutines et channels.
 - **Worker pool** :
-  - **Éphémère** : Pour les benchmarks locaux.
-  - **Persistant** : Pour le serveur TCP (créé une seule fois au démarrage).
+  - **Éphémère** : Pour les benchmarks locaux (concurrent.go).
+  - **Persistant** : Pour le serveur TCP (créé une seule fois au démarrage) (worker_pool.go).
 - **Serveur TCP** : Multi-clients avec limitation de connexions simultanées.
 - **Gestion des Timeouts** : Délais de lecture et d'écriture pour éviter les connexions fantômes.
 
