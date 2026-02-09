@@ -1,10 +1,5 @@
 package main
 
-
-/////////////////////////////
-// Nouvelle version optimisée
-/////////////////////////////
-
 // minLengthThreshold est un seuil pour éviter des allocations
 // pour les petites chaînes.
 const minLengthThreshold = 32

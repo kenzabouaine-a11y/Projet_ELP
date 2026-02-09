@@ -71,8 +71,13 @@ go run main.go concurrent.go levenshtein.go worker_pool.go -mode=bench -bench=pa
 Le serveur utilise un pool de workers persistant partagé entre tous les clients.
 ### Lancer le serveur
 ```bash
-go run main.go concurrent.go levenshtein.go worker_pool.go -mode=server -port=8000
+go run main.go concurrent.go levenshtein.go worker_pool.go -mode=server -port=8000 -readTimeout=5m
+
 ```
+```bash
+go run main.go concurrent.go levenshtein.go worker_pool.go -mode=server -maxdist=2 -readTimeout=5m
+```
+
 ### Options du serveur
 | Flag        |Description        |Défaut   |
 -------------- ------------------- ----------

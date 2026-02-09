@@ -22,7 +22,7 @@ func main() {
 	readTimeout := flag.Duration("readTimeout", 5*time.Second, "timeout lecture TCP")
 	writeTimeout := flag.Duration("writeTimeout", 5*time.Second, "timeout écriture TCP")
 
-	// ✅ Amélioration: filtre sur distance maximale (-1 = pas de filtre)
+	//  Amélioration: filtre sur distance maximale (-1 = pas de filtre)
 	maxDist := flag.Int("maxdist", -1, "distance maximale (-1 = pas de filtre)")
 
 	flag.Parse()
@@ -48,7 +48,7 @@ func main() {
 	pool := NewWorkerPool(runtime.NumCPU(), runtime.NumCPU()*8)
 	defer pool.Close()
 
-	// ✅ Amélioration: on passe maxDist au serveur
+	//  Amélioration: on passe maxDist au serveur
 	if err := startServer(*port, *maxConn, *readTimeout, *writeTimeout, pool, *maxDist); err != nil {
 		fmt.Println("Erreur serveur:", err)
 	}
@@ -78,7 +78,7 @@ func loadNames(path string, limit int) ([]string, error) {
 	return names, nil
 }
 
-// ✅ startServer prend maintenant maxDist
+//  startServer prend maintenant maxDist
 func startServer(port int, maxConn int, readTimeout, writeTimeout time.Duration, pool *WorkerPool, maxDist int) error {
 	addr := fmt.Sprintf(":%d", port)
 	ln, err := net.Listen("tcp", addr)
@@ -104,13 +104,13 @@ func startServer(port int, maxConn int, readTimeout, writeTimeout time.Duration,
 		sem <- struct{}{} // bloque si trop de connexions actives
 		go func(c net.Conn) {
 			defer func() { <-sem }()
-			// ✅ on passe maxDist à handleClient
+			//  on passe maxDist à handleClient
 			handleClient(c, readTimeout, writeTimeout, pool, maxDist)
 		}(conn)
 	}
 }
 
-// ✅ handleClient prend maintenant maxDist
+//  handleClient prend maintenant maxDist
 func handleClient(conn net.Conn, readTimeout, writeTimeout time.Duration, pool *WorkerPool, maxDist int) {
 	defer conn.Close()
 
@@ -154,7 +154,7 @@ func handleClient(conn net.Conn, readTimeout, writeTimeout time.Duration, pool *
 
 	res := computeDistancesWithPool(pool, target, names)
 
-	// ✅ Filtre maxDist (si activé)
+	//  Filtre maxDist (si activé)
 	if maxDist >= 0 {
 		filtered := res[:0] // réutilise le backing array
 		for _, r := range res {
